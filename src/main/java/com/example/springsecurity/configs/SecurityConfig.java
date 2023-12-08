@@ -8,7 +8,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +31,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().logoutSuccessUrl("/");
     }
 
+//    @Bean
+//    public UserDetailsService users() {
+//        UserDetails user = User.builder()
+//                .username("user")
+//                .password("{bcrypt}$2a$12$fYeXw94ubbe/qh..UJ8WVON3wH6/UcOfxHpA6z3HYfsS1DjYs2r8O")
+//                .roles("USER")
+//                .build();
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password("{bcrypt}$2a$12$fYeXw94ubbe/qh..UJ8WVON3wH6/UcOfxHpA6z3HYfsS1DjYs2r8O")
+//                .roles("ADMIN","USER")
+//                .build();
+//        return new InMemoryUserDetailsManager(user, admin);
+//    }
+
+
     @Bean
-    public UserDetailsService users() {
+    public JdbcUserDetailsManager users(DataSource dataSource) {
         UserDetails user = User.builder()
                 .username("user")
                 .password("{bcrypt}$2a$12$fYeXw94ubbe/qh..UJ8WVON3wH6/UcOfxHpA6z3HYfsS1DjYs2r8O")
@@ -41,6 +59,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .password("{bcrypt}$2a$12$fYeXw94ubbe/qh..UJ8WVON3wH6/UcOfxHpA6z3HYfsS1DjYs2r8O")
                 .roles("ADMIN","USER")
                 .build();
-        return new InMemoryUserDetailsManager(user, admin);
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+        if (jdbcUserDetailsManager.userExists(user.getUsername())) {
+            jdbcUserDetailsManager.deleteUser(user.getUsername());
+        }
+        if (jdbcUserDetailsManager.userExists(admin.getUsername())) {
+            jdbcUserDetailsManager.deleteUser(admin.getUsername());
+        }
+        jdbcUserDetailsManager.createUser(user);
+        jdbcUserDetailsManager.createUser(admin);
+        return jdbcUserDetailsManager;
     }
 }
