@@ -17,7 +17,14 @@ public class MainController {
 
     @GetMapping("/authenticated")
     public String pageForAuthenticatedUsers(Principal principal) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return "secured part of web service: " + principal.getName();
+    }
+    @GetMapping("/read-profile")
+    public String readForReadProfile() {
+        return "read profile page";
+    }
+    @GetMapping("/only-for-admins")
+    public String pageOnlyForAdmins() {
+        return "admins page";
     }
 }
