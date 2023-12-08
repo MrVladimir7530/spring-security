@@ -3,6 +3,8 @@ server:
   servlet:
     context-path: /security
 spring:
+  liquibase:
+    change-log: liquibase/changelog-master.yml
   jpa:
     show-sql: true
     properties:
@@ -10,8 +12,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL95Dialect
         temp:
           use_jdbc_metadata_defaults: false
+    hibernate:
+      ddl-auto: validate
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/DataTest1
+    url: jdbc:postgresql://localhost:5432/security
     username: AccountTest
     password: 1234567890
